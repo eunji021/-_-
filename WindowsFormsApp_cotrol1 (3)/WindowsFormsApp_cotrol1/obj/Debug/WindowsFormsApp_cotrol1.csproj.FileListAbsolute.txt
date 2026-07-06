@@ -1,0 +1,40 @@
+D:\2022214\WindowsFormsApp_cotrol1\bin\Debug\WindowsFormsApp_cotrol1.exe.config
+D:\2022214\WindowsFormsApp_cotrol1\bin\Debug\WindowsFormsApp_cotrol1.exe
+D:\2022214\WindowsFormsApp_cotrol1\bin\Debug\WindowsFormsApp_cotrol1.pdb
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.csproj.AssemblyReference.cache
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Properties.Resources.resources
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.csproj.GenerateResource.cache
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.csproj.CoreCompileInputs.cache
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\WindowsF.478BAC5F.Up2Date
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.exe
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.pdb
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Login.resources
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Form2.resources
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Config.resources
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Fa.resources
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Recipe.resources
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Utility.resources
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Maint.resources
+D:\2022214\WindowsFormsApp_cotrol1\bin\Debug\Fa\WindowsFormsApp_cotrol1.resources.dll
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Log.resources
+D:\2022214\WindowsFormsApp_cotrol1\obj\Debug\Fa\WindowsFormsApp_cotrol1.resources.dll
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\bin\Debug\WindowsFormsApp_cotrol1.exe.config
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\bin\Debug\WindowsFormsApp_cotrol1.exe
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\bin\Debug\WindowsFormsApp_cotrol1.pdb
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\bin\Debug\Fa\WindowsFormsApp_cotrol1.resources.dll
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.csproj.AssemblyReference.cache
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Config.resources
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Fa.resources
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Log.resources
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Login.resources
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Form2.resources
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Maint.resources
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Properties.Resources.resources
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Recipe.resources
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.Utility.resources
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.csproj.GenerateResource.cache
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.csproj.CoreCompileInputs.cache
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\Fa\WindowsFormsApp_cotrol1.resources.dll
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\WindowsF.478BAC5F.Up2Date
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.exe
+C:\Users\User\Documents\카카오톡 받은 파일\WindowsFormsApp_cotrol1 (3)\WindowsFormsApp_cotrol1\obj\Debug\WindowsFormsApp_cotrol1.pdb

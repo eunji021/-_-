@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{59937A31-C54F-4189-A849-FDAC63495A26}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>WindowsFormsApp_cotrol1</RootNamespace>
+    <AssemblyName>WindowsFormsApp_cotrol1</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="IEG3268_Dll">
+      <HintPath>C:\Users\User\Desktop\IEG3268_Dll.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Alarm System.cs" />
+    <Compile Include="ChamberEnum.cs" />
+    <Compile Include="ChamberBase.cs" />
+    <Compile Include="Config.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Config.Designer.cs">
+      <DependentUpon>Config.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CvdChamber.cs" />
+    <Compile Include="DI.cs" />
+    <Compile Include="DO.cs" />
+    <Compile Include="EtchChamber.cs" />
+    <Compile Include="Fa.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Fa.Designer.cs">
+      <DependentUpon>Fa.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImplantChamber.cs" />
+    <Compile Include="InterlockEngine.cs" />
+    <Compile Include="IOMapper.cs" />
+    <Compile Include="Log.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Login.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Login.Designer.cs">
+      <DependentUpon>Login.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Main.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include=".Designer.cs">
+      <DependentUpon>Main.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Maint.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Maint.Designer.cs">
+      <DependentUpon>Maint.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MotionController.cs" />
+    <Compile Include="obj\Debug\.NETFramework,Version=v4.7.2.AssemblyAttributes.cs" />
+    <Compile Include="ProcessController.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Recipe.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Recipe.Designer.cs">
+      <DependentUpon>Recipe.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Robot.cs" />
+    <Compile Include="RobotPosition.cs" />
+    <Compile Include="Utility.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Utility.Designer.cs">
+      <DependentUpon>Utility.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Config.resx">
+      <DependentUpon>Config.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Fa.resx">
+      <DependentUpon>Fa.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Log.resx">
+      <DependentUpon>Log.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Login.resx">
+      <DependentUpon>Login.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Main.resx">
+      <DependentUpon>Main.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Maint.resx">
+      <DependentUpon>Maint.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="obj\Debug\WindowsFormsApp_cotrol1.Config.resources" />
+    <EmbeddedResource Include="obj\Debug\WindowsFormsApp_cotrol1.Fa.resources" />
+    <EmbeddedResource Include="obj\Debug\WindowsFormsApp_cotrol1.Form2.resources" />
+    <EmbeddedResource Include="obj\Debug\WindowsFormsApp_cotrol1.Login.resources" />
+    <EmbeddedResource Include="obj\Debug\WindowsFormsApp_cotrol1.Maint.resources" />
+    <EmbeddedResource Include="obj\Debug\WindowsFormsApp_cotrol1.Properties.Resources.resources" />
+    <EmbeddedResource Include="obj\Debug\WindowsFormsApp_cotrol1.Recipe.resources" />
+    <EmbeddedResource Include="obj\Debug\WindowsFormsApp_cotrol1.Utility.resources" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Recipe.resx">
+      <DependentUpon>Recipe.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Utility.resx">
+      <DependentUpon>Utility.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="bin\Debug\WindowsFormsApp_cotrol1.exe.config" />
+    <None Include="obj\Debug\DesignTimeResolveAssemblyReferences.cache" />
+    <None Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="obj\Debug\WindowsF.478BAC5F.Up2Date" />
+    <None Include="obj\Debug\WindowsFormsApp_cotrol1.csproj.AssemblyReference.cache" />
+    <None Include="obj\Debug\WindowsFormsApp_cotrol1.csproj.CoreCompileInputs.cache" />
+    <None Include="obj\Debug\WindowsFormsApp_cotrol1.csproj.GenerateResource.cache" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bin\Debug\IEG3268_Dll.dll" />
+    <Content Include="bin\Debug\WindowsFormsApp_cotrol1.exe" />
+    <Content Include="bin\Debug\WindowsFormsApp_cotrol1.pdb" />
+    <Content Include="obj\Debug\WindowsFormsApp_cotrol1.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\Debug\WindowsFormsApp_cotrol1.exe" />
+    <Content Include="obj\Debug\WindowsFormsApp_cotrol1.pdb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Release\" />
+    <Folder Include="obj\Debug\TempPE\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
