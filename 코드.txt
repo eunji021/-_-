@@ -1,0 +1,1442 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WindowsFormsApp_cotrol1
+{
+    // 로봇 위치 값
+     public  class RobotPosition
+    {
+
+
+        // HOME 위치
+   
+        public const long Home_X = 0;
+        public const long Home_Z = 0;
+
+        // PICK 위치 (작업 높이)
+        public const long Pick_Z = 50;
+
+        // SAFE 위치 (이동용 높이)
+        public const long Safe_Z = 200;
+
+
+   
+        // FOUP A (좌/우 = 14140)
+        public const long FOUP_A_X = 14140;
+
+        public const long FOUP_A_Slot1_Up = 302380;
+        public const long FOUP_A_Slot1_Down = 102379;
+
+        public const long FOUP_A_Slot2_Up = 982378;
+        public const long FOUP_A_Slot2_Down = 782378;
+
+        public const long FOUP_A_Slot3_Up = 1627604;
+        public const long FOUP_A_Slot3_Down = 1432388;
+
+        public const long FOUP_A_Slot4_Up = 2332102;
+        public const long FOUP_A_Slot4_Down = 2119399;
+
+        public const long FOUP_A_Slot5_Up = 3018457;
+        public const long FOUP_A_Slot5_Down = 2818463;
+
+
+        //  FOUP B (좌/우 = -394293)
+        public const long FOUP_B_X = -394293;
+
+        public const long FOUP_B_Slot1_Up = 302380;
+        public const long FOUP_B_Slot1_Down = 102379;
+
+        public const long FOUP_B_Slot2_Up = 982378;
+        public const long FOUP_B_Slot2_Down = 782378;
+
+        public const long FOUP_B_Slot3_Up = 1627604;
+        public const long FOUP_B_Slot3_Down = 1432388;
+
+        public const long FOUP_B_Slot4_Up = 2332102;
+        public const long FOUP_B_Slot4_Down = 2119399;
+
+        public const long FOUP_B_Slot5_Up = 3018457;
+        public const long FOUP_B_Slot5_Down = 2818463;
+
+
+        //  CHAMBER A
+        public const long CH_A_X = 62000;
+
+        public const long CH_A_Up = 1156931;
+        public const long CH_A_Down = 806931;
+
+
+
+        //  CHAMBER B
+        public const long CH_B_X = 190823;
+
+        public const long CH_B_Up = 1156931;
+        public const long CH_B_Down = 806931;
+
+
+ 
+        //  CHAMBER C
+
+        public const long CH_C_X = 322000;
+
+        public const long CH_C_Up = 1156931;
+        public const long CH_C_Down = 806931;
+    }
+}
+
+----------------------------------------------------------------------------------------------
+using IEG3268_Dll;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WindowsFormsApp_cotrol1
+{
+    public class Robot
+    {
+
+        private IOMapper io;
+        private MotionController motion;
+        private InterlockEngine interlock;
+
+        private bool isEmergencyStop = false;
+
+        public Robot(IOMapper iomapper, MotionController motionController, InterlockEngine interlockEngine)
+        {
+            io = iomapper;
+            motion = motionController;
+            interlock = interlockEngine;
+        }
+
+        //  EMERGENCY STOP
+        public void EmergencyStop()
+        {
+            isEmergencyStop = true;
+
+            motion.StopAll();
+        }
+
+        public void EmergencyReset()
+        {
+            isEmergencyStop = false;
+        }
+
+        //  SAFETY CHECK
+        private bool SafetyOK()
+        {
+            return !isEmergencyStop && interlock.SystemOK();
+        }
+
+        //  HOME
+        public void Home()
+        {
+            if (!SafetyOK()) return;
+
+            if (!interlock.HomeEnable()) return;
+
+            MoveTo(RobotPosition.Home_X, RobotPosition.Home_Z);
+        }
+
+
+        //  MOVE (핵심 수정: WAIT 추가)
+        public void MoveTo(long x, long z)
+        {
+            if (!SafetyOK()) return;
+
+            // 이동 중이면 다른 명령 금지
+            if (motion.IsBusy())
+                return;
+
+            motion.MoveX(x);
+            motion.MoveZ(z);
+
+            while (motion.IsBusy())
+            {
+                // Timeout 발생 시 비상정지
+                if (motion.IsTimeout())
+                {
+                    EmergencyStop();
+                    return;
+                }
+
+                System.Threading.Thread.Sleep(10);
+            }
+        }
+
+
+
+        //  PICK
+        public void Pick()
+        {
+            if (!SafetyOK()) return;
+
+            if (!interlock.VacuumOK())
+                return;
+
+            io.DO_Write(DO.VacuumOn, true);
+
+            System.Threading.Thread.Sleep(100);
+        }
+
+        //  PLACE
+        public void Place()
+        {
+            if (!SafetyOK()) return;
+
+            io.DO_Write(DO.VacuumOn, false);
+
+            System.Threading.Thread.Sleep(100);
+        }
+
+
+        //  FOUP PICK
+        public void PickFromFOUP_A(int slot)
+        {
+            if (!SafetyOK()) return;
+
+            long down = RobotPosition.FOUP_A_Slot1_Down;
+
+            switch (slot)
+            {
+                case 1:
+                    down = RobotPosition.FOUP_A_Slot1_Down;
+                    break;
+
+                case 2:
+                    down = RobotPosition.FOUP_A_Slot2_Down;
+                    break;
+
+                case 3:
+                    down = RobotPosition.FOUP_A_Slot3_Down;
+                    break;
+
+                case 4:
+                    down = RobotPosition.FOUP_A_Slot4_Down;
+                    break;
+
+                case 5:
+                    down = RobotPosition.FOUP_A_Slot5_Down;
+                    break;
+            }
+
+            MoveTo(RobotPosition.FOUP_A_X, RobotPosition.Safe_Z);
+            MoveTo(RobotPosition.FOUP_A_X, down);
+
+            Pick();
+
+            MoveTo(RobotPosition.FOUP_A_X, RobotPosition.Safe_Z);
+        }
+
+        //  CHAMBER PLACE
+        public void PlaceToChamber(char chamber)
+        {
+            if (!SafetyOK()) return;
+
+            long x = 0;
+            long down = 0;
+
+            switch (chamber)
+            {
+                case 'A':
+                    x = RobotPosition.CH_A_X;
+                    down = RobotPosition.CH_A_Down;
+                    break;
+
+                case 'B':
+                    x = RobotPosition.CH_B_X;
+                    down = RobotPosition.CH_B_Down;
+                    break;
+
+                case 'C':
+                    x = RobotPosition.CH_C_X;
+                    down = RobotPosition.CH_C_Down;
+                    break;
+            }
+
+            MoveTo(x, RobotPosition.Safe_Z);
+            MoveTo(x, down);
+
+            Place();
+
+            MoveTo(x, RobotPosition.Safe_Z);
+        }
+    }
+}
+
+----------------------------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+//Windows Forms(UI) 기능을 사용하기 위한 라이브러리
+//
+// 버튼(Button), 라벨(Label), 폼(Form)
+//  타이머(Timer), 메시지박스(MessageBox)
+//  화면(UI) 이벤트 처리 기능 포함
+//
+//  WinForms 기반 자동화 프로그램에서 반드시 필요
+//  Robot / ProcessController Timer 동작에도 사용됨
+
+namespace WindowsFormsApp_cotrol1
+{
+     public class ProcessController
+    {
+        private Robot robot;
+        private EtchChamber etch;
+        private CvdChamber cvd;
+        private ImplantChamber implant;
+        private InterlockEngine interlock;
+        private Alarm_System alarm;
+
+        private int wafer = 1;
+        private int step = 0;
+
+        public ProcessController(
+            Robot r,
+            EtchChamber e,
+            CvdChamber c,
+            ImplantChamber i,
+            InterlockEngine inter,
+            Alarm_System a)
+        {
+            robot = r;
+            etch = e;
+            cvd = c;
+            implant = i;
+            interlock = inter;
+            alarm = a;
+        }
+
+        // ==========================
+        // ALL STOP
+        // ==========================
+        private void AllStop()
+        {
+            robot.EmergencyStop();
+
+            etch.state = ChamberEnum.ChamberStatus.IDLE;
+            cvd.state = ChamberEnum.ChamberStatus.IDLE;
+            implant.state = ChamberEnum.ChamberStatus.IDLE;
+        }
+
+        // ==========================
+        // PLC SCAN
+        // ==========================
+        public void Scan()
+        {
+            // 1. ALARM
+            alarm.CheckAlarm();
+            if (alarm.IsAlarm)
+            {
+                AllStop();
+                return;
+            }
+
+            // 2. INTERLOCK
+            if (!interlock.SystemOK())
+            {
+                AllStop();
+                return;
+            }
+
+            switch (step)
+            {
+                // ======================
+                // HOME
+                // ======================
+                case 0:
+                    robot.Home();
+                    step = 1;
+                    break;
+
+                // ======================
+                // PICK
+                // ======================
+                case 1:
+                    robot.PickFromFOUP_A(wafer);
+                    step = 2;
+                    break;
+
+                // ======================
+                // ETCH
+                // ======================
+                case 2:
+                    etch.UpdateProcess();
+
+                    if (etch.state != ChamberEnum.ChamberStatus.IDLE)
+                        return;
+
+                    step = 3;
+                    break;
+
+                // ======================
+                // CVD
+                // ======================
+                case 3:
+                    cvd.UpdateProcess();
+
+                    if (cvd.state != ChamberEnum.ChamberStatus.IDLE)
+                        return;
+
+                    step = 4;
+                    break;
+
+                // ======================
+                // IMPLANT
+                // ======================
+                case 4:
+                    implant.UpdateProcess();
+
+                    if (implant.state != ChamberEnum.ChamberStatus.IDLE)
+                        return;
+
+                    step = 5;
+                    break;
+
+                // ======================
+                // RETURN
+                // ======================
+                case 5:
+                    robot.MoveTo(
+                        RobotPosition.FOUP_A_X,
+                        RobotPosition.Safe_Z
+                    );
+
+                    wafer++;
+                    step = (wafer > 5) ? 99 : 1;
+                    break;
+
+                // ======================
+                // END
+                // ======================
+                case 99:
+                    AllStop();
+                    break;
+            }
+        }
+    }
+}
+
+---------------------------------------------------------------------------------------------
+using IEG3268_Dll;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static WindowsFormsApp_cotrol1.RobotPosition;
+
+namespace WindowsFormsApp_cotrol1
+{
+    public class MotionController
+    {
+        private IEG3268 eth;
+
+        public bool busyX;
+        public bool busyZ;
+
+        private DateTime xStartTime;
+        private DateTime zStartTime;
+
+        private int timeoutMs = 5000;
+
+        public MotionController(IEG3268 ethercat)
+        {
+            eth = ethercat;
+        }
+
+        // ==========================
+        // Z JOG UP (안전 상승)
+        // ==========================
+        public void JogZ_Up()
+        {
+            eth.Axis1_UD_POS_Update(Safe_Z);
+            eth.Axis1_UD_Move_Send();
+
+            busyZ = true;
+            zStartTime = DateTime.Now;
+        }
+
+        // ==========================
+        // Z HOME
+        // ==========================
+        public void HomeZ()
+        {
+            eth.Axis1_UD_POS_Update(Home_Z);
+            eth.Axis1_UD_Move_Send();
+
+            busyZ = true;
+            zStartTime = DateTime.Now;
+        }
+
+        // ==========================
+        // X HOME
+        // ==========================
+        public void HomeX()
+        {
+            eth.Axis2_LR_POS_Update(Home_X);
+            eth.Axis2_LR_Move_Send();
+
+            busyX = true;
+            xStartTime = DateTime.Now;
+        }
+
+        // ==========================
+        // 상태 체크
+        // ==========================
+        public bool IsBusy() => busyX || busyZ;
+
+        public bool IsTimeout()
+        {
+            if (busyZ && (DateTime.Now - zStartTime).TotalMilliseconds > timeoutMs)
+                return true;
+
+            if (busyX && (DateTime.Now - xStartTime).TotalMilliseconds > timeoutMs)
+                return true;
+
+            return false;
+        }
+
+        public void Update()
+        {
+            if (busyZ && (DateTime.Now - zStartTime).TotalMilliseconds > 300)
+                busyZ = false;
+
+            if (busyX && (DateTime.Now - xStartTime).TotalMilliseconds > 300)
+                busyX = false;
+        }
+    }
+}
+
+----------------------------------------------------------------------------------------------
+using IEG3268_Dll;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WindowsFormsApp_cotrol1
+{
+    // EtherCAT Digital Input / Output 제어 클래스
+    // Robot, Chamber, Alarm, Interlock에서 공통으로 사용
+    public class IOMapper
+    {
+        private IEG3268 eth;
+
+        // 생성자
+        public IOMapper(IEG3268 ethercat)
+        {
+            eth = ethercat;
+        }
+
+        // ================================
+        // DIGITAL OUTPUT (DO)
+        // ================================
+        // 출력 신호 ON / OFF
+        public void DO_Write(int address, bool value)
+        {
+            eth.Digital_Output(address, value);
+
+            // 디버깅용 로그
+            Console.WriteLine($"[DO] Addr : {address}, Value : {value}");
+        }
+
+        // ================================
+        // DIGITAL INPUT (DI)
+        // ================================
+        // 입력 신호 읽기
+        public bool DI_Read(int address)
+        {
+            bool value = eth.Digital_Input(address);
+
+            // 디버깅용 로그
+            Console.WriteLine($"[DI] Addr : {address}, Value : {value}");
+
+            return value;
+        }
+
+        // ================================
+        // ALL OUTPUT OFF
+        // ================================
+        // EMG 또는 Alarm 발생 시 모든 출력 OFF
+        public void AllOutputOff()
+        {
+            for (int i = 0; i <= 15; i++)
+            {
+                eth.Digital_Output(i, false);
+            }
+
+            Console.WriteLine("[DO] ALL OUTPUT OFF");
+        }
+    }
+}
+----------------------------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WindowsFormsApp_cotrol1
+{
+    // 장비 전체 안전 조건을 관리하는 핵심 클래스
+    // Robot / Chamber 동작 허가 여부 판단
+    public class InterlockEngine
+    {
+        private IOMapper io;
+
+        public InterlockEngine(IOMapper mapper)
+        {
+            io = mapper;
+        }
+
+        // ==========================
+        // EMERGENCY STOP
+        // ==========================
+        public bool Emergency()
+        {
+            return io.DI_Read(DI.EMG);
+        }
+
+        // ==========================
+        // POWER
+        // ==========================
+        public bool PowerOK()
+        {
+            return io.DI_Read(DI.Power1) &&
+                   io.DI_Read(DI.Power2);
+        }
+
+        // ==========================
+        // AIR PRESSURE
+        // ==========================
+        public bool PressureOK()
+        {
+            return io.DI_Read(DI.MainPressure);
+        }
+
+        // ==========================
+        // VACUUM
+        // ==========================
+        public bool VacuumOK()
+        {
+            return io.DI_Read(DI.VacuumPressure);
+        }
+
+        // ==========================
+        // SYSTEM OK (핵심 게이트)
+        // ==========================
+        public bool SystemOK()
+        {
+            return PowerOK() &&
+                   PressureOK() &&
+                   VacuumOK() &&
+                   !Emergency();
+        }
+
+        // ==========================
+        // ROBOT ENABLE
+        // ==========================
+        public bool RobotEnable()
+        {
+            return SystemOK();
+        }
+
+        // ==========================
+        // HOME / MOVE ENABLE
+        // ==========================
+        public bool MotionEnable()
+        {
+            return SystemOK() &&
+                   io.DI_Read(DI.RobotBackwardSensor);
+        }
+
+        // ==========================
+        // PROCESS ENABLE
+        // ==========================
+        public bool ProcessEnable()
+        {
+            return SystemOK();
+        }
+
+        // ==========================
+        // ALARM CHECK
+        // ==========================
+        public bool IsAlarm()
+        {
+            return !SystemOK();
+        }
+
+        // ==========================
+        // DOOR SENSOR
+        // ==========================
+        public bool DoorA_Open() => io.DI_Read(DI.A_DoorUpSensor);
+        public bool DoorA_Close() => io.DI_Read(DI.A_DoorDownSensor);
+
+        public bool DoorB_Open() => io.DI_Read(DI.B_DoorUpSensor);
+        public bool DoorB_Close() => io.DI_Read(DI.B_DoorDownSensor);
+
+        public bool DoorC_Open() => io.DI_Read(DI.C_DoorUpSensor);
+        public bool DoorC_Close() => io.DI_Read(DI.C_DoorDownSensor);
+    }
+}
+----------------------------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WindowsFormsApp_cotrol1
+{
+   public class DI
+    {
+
+        // POWER / SYSTEM
+       
+        public const int Power1 = 0;
+        public const int Power2 = 1;
+
+        // MODE / EMERGENCY
+        
+        public const int SelectSW = 2;
+        public const int EMG = 3;          //  Emergency Stop (핵심)
+
+        // PRESSURE
+
+        public const int MainPressure = 5;
+
+        // CHAMBER A SENSORS
+
+        public const int A_DoorUpSensor = 6;
+        public const int A_DoorDownSensor = 7;
+
+        // CHAMBER B SENSORS
+
+        public const int B_DoorUpSensor = 8;
+        public const int B_DoorDownSensor = 9;
+
+        // CHAMBER C SENSORS
+
+        public const int C_DoorUpSensor = 10;
+        public const int C_DoorDownSensor = 11;
+       
+        // ROBOT CYLINDER SENSORS     
+        public const int RobotBackwardSensor = 12;
+        public const int RobotForwardSensor = 13;
+
+        // VACUUM SENSO
+        public const int VacuumPressure = 14;     // 진공 정상
+    }
+}
+
+--------------------------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WindowsFormsApp_cotrol1
+{
+   public class DO
+   {
+        // TOWER LAMP (장비 상태 표시)
+     
+        public const int TowerRed = 0;     // ALARM
+        public const int TowerYellow = 1;  // READY
+        public const int TowerGreen = 2;   // RUN
+
+        // CHAMBER A
+    
+        public const int A_Lamp = 3;
+        public const int A_DoorUp = 4;
+        public const int A_DoorDown = 5;
+
+        // CHAMBER B
+ 
+        public const int B_Lamp = 6;
+        public const int B_DoorUp = 7;
+        public const int B_DoorDown = 8;
+
+        // CHAMBER C
+        public const int C_Lamp = 9;
+        public const int C_DoorUp = 10;
+        public const int C_DoorDown = 11;
+
+        // ROBOT CYLINDER
+       
+        public const int RobotForward = 12;
+        public const int RobotBackward = 13;
+
+        // VACUUM SYSTEM
+        public const int VacuumOn = 14;
+        public const int VacuumOff = 15;
+    }
+}
+-------------------------------------------------------------------------------------------
+using IEG3268_Dll;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static WindowsFormsApp_cotrol1.ChamberEnum;
+
+
+namespace WindowsFormsApp_cotrol1
+{
+
+    // 모든 챔버의 부모 클래스
+    // 공통 속성과 기능을 정의
+    public abstract class ChamberBase
+    {
+
+        protected IEG3268 EtherCAT;
+
+
+        //  챔버 상태 (PLC Step 구조)
+        public ChamberStatus state;
+
+        // 공정 타이머 (단순 시간 기반 시뮬레이션)
+        protected int timer = 0;
+
+        public ChamberBase(IEG3268 eth)
+        {
+            EtherCAT = eth;
+            state = ChamberStatus.IDLE;
+        }
+
+        //  도어 제어 (각 챔버별 구현)
+        public abstract void OpenDoor();
+        public abstract void CloseDoor();
+
+        //  공정 시작 조건
+        public abstract bool ProcessStartCondition();
+
+        //  공정 완료 조건
+        public abstract bool ProcessDoneCondition();
+
+        //  PLC Scan에서 계속 호출
+        public virtual void UpdateProcess()
+        {
+            switch (state)
+            {
+                case ChamberStatus.DOOR_OPEN:
+                    // 문 열기 실행
+                    OpenDoor();
+
+                    // 다음 단계 이동
+                    state = ChamberStatus.PROCESS;
+                    break;
+
+                case ChamberStatus.PROCESS:
+                    // 공정 시작 조건 확인
+                    if (!ProcessStartCondition()) return;
+
+                    // 시간 흐름 시뮬레이션
+                    timer++;
+
+                    // 일정 시간 후 다음 단계
+                    if (timer > 10)
+                    {
+                        timer = 0;
+                        state = ChamberStatus.WAIT_DONE;
+                    }
+                    break;
+
+                case ChamberStatus.WAIT_DONE:
+                    // 공정 완료 조건 확인
+                    if (!ProcessDoneCondition()) return;
+
+                    // 다음 단계: 도어 닫기
+                    state = ChamberStatus.DOOR_CLOSE;
+                    break;
+
+                case ChamberStatus.DOOR_CLOSE:
+                    // 문 닫기 실행
+                    CloseDoor();
+
+                    // 초기 상태 복귀
+                    state = ChamberStatus.IDLE;
+                    break;
+            }
+        }
+    }
+}
+
+
+--------------------------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WindowsFormsApp_cotrol1
+{
+      public class ChamberEnum
+    {
+        //    // 챔버 상태
+        //    // 챔버의 현재 동작 상태
+        //    public enum ChamberStatus
+        //    {
+        //        IDLE,       // 대기 상태
+        //        RUNNING     // 공정 진행 중
+        //    }
+
+        //    // 타워램프 색상
+        //    public enum LampColor
+        //    {
+        //        Yellow,     // 대기 상태
+        //        Green       // 공정 진행 중
+        //    }
+
+        //    // 식각(Etch) 공정 단계
+        //    public enum EtchStep
+        //    {
+        //        GAS_CHARGE,         // 가스 투입
+        //        PRESSURE_STABLE,    // 압력 안정화
+        //        PLASMA_ON,          // 플라즈마 생성
+        //        PURGE               // 가스 배기
+        //    }
+
+        //    // 증착(CVD) 공정 단계
+        //    public enum CvdStep
+        //    {
+        //        PRE_HEATING,        // 예열
+        //        GAS_MIX,            // 가스 혼합
+        //        DEPOSITION,         // 증착
+        //        PURGE_COOL          // 배기 및 냉각
+        //    }
+
+        //    // 이온주입 공정 단계
+        //    public enum ImplantStep
+        //    {
+        //        HIGH_VACUUM,        // 초고진공 형성
+        //        SOURCE_ON,          // 이온원 ON
+        //        BEAM_SCAN,          // 빔 조사
+        //        BEAM_OFF            // 빔 OFF
+        //    }
+
+       
+        public enum ChamberStatus
+        {
+            IDLE,
+            DOOR_OPEN,
+            PROCESS,
+            WAIT_DONE,
+            DOOR_CLOSE,
+            ERROR
+        }
+
+        public enum LampColor
+        {
+            Yellow,
+            Green
+        }
+
+        public enum EtchStep
+        {
+            GAS_CHARGE,
+            PRESSURE_STABLE,
+            PLASMA_ON,
+            PURGE
+        }
+
+        public enum CvdStep
+        {
+            PRE_HEATING,
+            GAS_MIX,
+            DEPOSITION,
+            PURGE_COOL
+        }
+
+        public enum ImplantStep
+        {
+            HIGH_VACUUM,
+            SOURCE_ON,
+            BEAM_SCAN,
+            BEAM_OFF
+        }
+
+
+
+        public enum MainState
+        {
+            INIT,
+            ROBOT_HOME,
+            PICK_FOUP,
+            PROCESS_ETCH,
+            PROCESS_CVD,
+            PROCESS_IMPLANT,
+            RETURN_FOUP,
+            COMPLETE,
+            STOP
+        }
+    }
+}
+---------------------------------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WindowsFormsApp_cotrol1
+{
+   public  class Alarm_System
+    {
+        private IOMapper io;
+
+        // 현재 알람 상태
+        public bool IsAlarm { get; private set; }
+        public string LastAlarmMessage { get; private set; }
+
+        public Alarm_System(IOMapper mapper)
+        {
+            io = mapper;
+        }
+
+        // ==========================
+        // PLC CYCLE CHECK
+        // ==========================
+        public void CheckAlarm()
+        {
+            // 이미 알람 상태면 추가 검사 X
+            if (IsAlarm)
+                return;
+
+            // EMG (최우선)
+            if (io.DI_Read(DI.EMG))
+            {
+                SetAlarm("EMG PRESSED");
+                return;
+            }
+
+            // AIR PRESSURE
+            if (!io.DI_Read(DI.MainPressure))
+            {
+                SetAlarm("AIR PRESSURE FAIL");
+                return;
+            }
+
+            // VACUUM
+            if (!io.DI_Read(DI.VacuumPressure))
+            {
+                SetAlarm("VACUUM FAIL");
+                return;
+            }
+        }
+
+        // ==========================
+        // ALARM SET
+        // ==========================
+        private void SetAlarm(string msg)
+        {
+            IsAlarm = true;
+            LastAlarmMessage = msg;
+        }
+
+        // ==========================
+        // RESET (수동 복구)
+        // ==========================
+        public void ResetAlarm()
+        {
+            // 반드시 조건 확인 후 리셋 (안전)
+            if (!io.DI_Read(DI.EMG) &&
+                io.DI_Read(DI.MainPressure) &&
+                io.DI_Read(DI.VacuumPressure))
+            {
+                IsAlarm = false;
+                LastAlarmMessage = "";
+            }
+        }
+    }
+}
+
+--------------------------------------------------------------------------------------------
+using IEG3268_Dll;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static System.Windows.Forms.AxHost;
+using static WindowsFormsApp_cotrol1.ChamberEnum;
+
+namespace WindowsFormsApp_cotrol1
+{
+    // Etch(식각) 챔버 클래스
+    //  Etch (식각) 챔버
+    // - 가스 + RF + 플라즈마 기반 공정
+
+    public class EtchChamber : ChamberBase
+
+    {
+        // 공정 변수
+        // ==========================
+        public double GasFlowCF4 { get; set; }
+        public double RfPower { get; set; }
+        public double Pressure { get; set; }
+
+        // ==========================
+        // 내부 공정 Step
+        // ==========================
+        public enum EtchStep
+        {
+            GAS_CHARGE,
+            PRESSURE_STABLE,
+            PLASMA_ON,
+            PURGE,
+            DONE
+        }
+
+        public EtchStep Step { get; set; }
+
+        // ==========================
+        // 생성자
+        // ==========================
+        public EtchChamber(IEG3268 ethercat) : base(ethercat)
+        {
+            GasFlowCF4 = 45.2;
+            RfPower = 300;
+            Pressure = 0.05;
+
+            Step = EtchStep.GAS_CHARGE;
+        }
+
+        // ==========================
+        // DOOR OPEN
+        // ==========================
+        public override void OpenDoor()
+        {
+            // TODO: DO 제어 (A_DoorUp 등)
+            // EtherCAT DO 연결 필요
+        }
+
+        // ==========================
+        // DOOR CLOSE
+        // ==========================
+        public override void CloseDoor()
+        {
+            // TODO: DO 제어 (A_DoorDown 등)
+        }
+
+        // ==========================
+        // 공정 시작 조건
+        // ==========================
+        public override bool ProcessStartCondition()
+        {
+            // 예: 압력 안정 + 인터락 OK
+            return true;
+        }
+
+        // ==========================
+        // 공정 완료 조건
+        // ==========================
+        public override bool ProcessDoneCondition()
+        {
+            // 예: 시간 + 센서 완료
+            return true;
+        }
+
+        // ==========================
+        // 핵심 PLC 업데이트
+        // ==========================
+        public override void UpdateProcess()
+        {
+            switch (state)
+            {
+                // ======================
+                // 1. DOOR OPEN
+                // ======================
+                case ChamberStatus.DOOR_OPEN:
+
+                    OpenDoor();
+                    state = ChamberStatus.PROCESS;
+                    break;
+
+                // ======================
+                // 2. PROCESS (ETCH 진행)
+                // ======================
+                case ChamberStatus.PROCESS:
+
+                    // 시작 조건 체크
+                    if (!ProcessStartCondition())
+                        return;
+
+                    switch (Step)
+                    {
+                        case EtchStep.GAS_CHARGE:
+                            Step = EtchStep.PRESSURE_STABLE;
+                            break;
+
+                        case EtchStep.PRESSURE_STABLE:
+                            Step = EtchStep.PLASMA_ON;
+                            break;
+
+                        case EtchStep.PLASMA_ON:
+                            Step = EtchStep.PURGE;
+                            break;
+
+                        case EtchStep.PURGE:
+                            Step = EtchStep.DONE;
+                            break;
+
+                        case EtchStep.DONE:
+                            state = ChamberStatus.WAIT_DONE;
+                            break;
+                    }
+
+                    break;
+
+                // ======================
+                // 3. WAIT DONE
+                // ======================
+                case ChamberStatus.WAIT_DONE:
+
+                    // 완료 조건 체크
+                    if (!ProcessDoneCondition())
+                        return;
+
+                    CloseDoor();
+
+                    // 초기화
+                    Step = EtchStep.GAS_CHARGE;
+                    state = ChamberStatus.IDLE;
+                    break;
+            }
+        }
+    }
+}
+
+---------------------------------------------------------------------------------------------
+using IEG3268_Dll;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static WindowsFormsApp_cotrol1.ChamberEnum;
+
+namespace WindowsFormsApp_cotrol1
+{
+    // CVD(증착) 챔버 클래스
+
+    //  CVD (증착) 챔버
+    // - 가스 혼합 + 열 + 증착 공정 수행
+    public class CvdChamber : ChamberBase
+    {
+
+        public double Temperature { get; set; }
+
+        public enum CvdStep
+        {
+            PRE_HEATING,
+            GAS_MIX,
+            DEPOSITION,
+            PURGE_COOL,
+            DONE
+        }
+
+        public CvdStep Step { get; set; }
+
+        public CvdChamber(IEG3268 ethercat) : base(ethercat)
+        {
+            Temperature = 600;
+            Step = CvdStep.PRE_HEATING;
+        }
+
+        public override void OpenDoor()
+        {
+            // TODO: DO 제어
+        }
+
+        public override void CloseDoor()
+        {
+            // TODO: DO 제어
+        }
+
+        public override bool ProcessStartCondition()
+        {
+            // 인터락 연결 자리
+            return true;
+        }
+
+        public override bool ProcessDoneCondition()
+        {
+            // 완료 조건 자리
+            return true;
+        }
+
+        public override void UpdateProcess()
+        {
+            switch (state)
+            {
+                case ChamberStatus.DOOR_OPEN:
+                    OpenDoor();
+                    state = ChamberStatus.PROCESS;
+                    break;
+
+                case ChamberStatus.PROCESS:
+
+                    if (!ProcessStartCondition())
+                        return;
+
+                    switch (Step)
+                    {
+                        case CvdStep.PRE_HEATING:
+                            Step = CvdStep.GAS_MIX;
+                            break;
+
+                        case CvdStep.GAS_MIX:
+                            Step = CvdStep.DEPOSITION;
+                            break;
+
+                        case CvdStep.DEPOSITION:
+                            Step = CvdStep.PURGE_COOL;
+                            break;
+
+                        case CvdStep.PURGE_COOL:
+                            Step = CvdStep.DONE;
+                            break;
+
+                        case CvdStep.DONE:
+                            state = ChamberStatus.WAIT_DONE;
+                            break;
+                    }
+                    break;
+
+                case ChamberStatus.WAIT_DONE:
+
+                    if (!ProcessDoneCondition())
+                        return;
+
+                    CloseDoor();
+
+                    Step = CvdStep.PRE_HEATING;
+                    state = ChamberStatus.IDLE;
+                    break;
+            }
+        }
+    }
+}
+----------------------------------------------------------------------------------------------
+using IEG3268_Dll;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static WindowsFormsApp_cotrol1.ChamberEnum;
+
+namespace WindowsFormsApp_cotrol1
+{
+    // Implant(이온주입) 챔버 클래스
+
+    //  Implant (이온주입) 챔버
+    // - 고에너지 이온 빔을 이용한 공정
+
+    public class ImplantChamber : ChamberBase
+    {
+        public double BeamCurrent { get; set; }
+
+        public enum ImplantStep
+        {
+            HIGH_VACUUM,
+            SOURCE_ON,
+            BEAM_SCAN,
+            BEAM_OFF,
+            DONE
+        }
+
+        public ImplantStep Step { get; set; }
+
+        public ImplantChamber(IEG3268 ethercat) : base(ethercat)
+        {
+            BeamCurrent = 15.5;
+            Step = ImplantStep.HIGH_VACUUM;
+        }
+
+        public override void OpenDoor()
+        {
+            // TODO: DO 제어
+        }
+
+        public override void CloseDoor()
+        {
+            // TODO: DO 제어
+        }
+
+        public override bool ProcessStartCondition()
+        {
+            return true;
+        }
+
+        public override bool ProcessDoneCondition()
+        {
+            return true;
+        }
+
+        public override void UpdateProcess()
+        {
+            switch (state)
+            {
+                case ChamberStatus.DOOR_OPEN:
+                    OpenDoor();
+                    state = ChamberStatus.PROCESS;
+                    break;
+
+                case ChamberStatus.PROCESS:
+
+                    if (!ProcessStartCondition())
+                        return;
+
+                    switch (Step)
+                    {
+                        case ImplantStep.HIGH_VACUUM:
+                            Step = ImplantStep.SOURCE_ON;
+                            break;
+
+                        case ImplantStep.SOURCE_ON:
+                            Step = ImplantStep.BEAM_SCAN;
+                            break;
+
+                        case ImplantStep.BEAM_SCAN:
+                            Step = ImplantStep.BEAM_OFF;
+                            break;
+
+                        case ImplantStep.BEAM_OFF:
+                            Step = ImplantStep.DONE;
+                            break;
+
+                        case ImplantStep.DONE:
+                            state = ChamberStatus.WAIT_DONE;
+                            break;
+                    }
+                    break;
+
+                case ChamberStatus.WAIT_DONE:
+
+                    if (!ProcessDoneCondition())
+                        return;
+
+                    CloseDoor();
+
+                    Step = ImplantStep.HIGH_VACUUM;
+                    state = ChamberStatus.IDLE;
+                    break;
+            }
+        }
+    }
+
+}
